@@ -5,6 +5,7 @@ const crypto=require('crypto');
 const app=express(), PORT=process.env.PORT||3000;
 const DATA_DIR=process.env.DATA_DIR||path.join(__dirname,'data'), DATA_FILE=path.join(DATA_DIR,'campus.json');
 app.disable('x-powered-by');
+app.set('trust proxy',1);
 app.use((req,res,next)=>{
   res.setHeader('X-Content-Type-Options','nosniff');
   res.setHeader('Referrer-Policy','strict-origin-when-cross-origin');

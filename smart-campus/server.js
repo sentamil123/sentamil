@@ -4,8 +4,17 @@ const path=require('path');
 const crypto=require('crypto');
 const app=express(), PORT=process.env.PORT||3000;
 const DATA_DIR=process.env.DATA_DIR||path.join(__dirname,'data'), DATA_FILE=path.join(DATA_DIR,'campus.json');
-app.use(express.json({limit:'1mb'}));
-app.use(express.static(path.join(__dirname,'public')));
+app.disable('x-powered-by');
+app.use((req,res,next)=>{
+  res.setHeader('X-Content-Type-Options','nosniff');
+  res.setHeader('Referrer-Policy','strict-origin-when-cross-origin');
+  res.setHeader('X-Frame-Options','SAMEORIGIN');
+  res.setHeader('Permissions-Policy','camera=(), microphone=(), geolocation=()');
+  if(req.secure || req.headers['x-forwarded-proto']==='https') res.setHeader('Strict-Transport-Security','max-age=31536000; includeSubDomains');
+  next();
+});
+app.use(express.json({limit:'100kb'}));
+app.use(express.static(path.join(__dirname,'public'),{maxAge:'1h'}));
 const seed={
  college:{name:'Northbridge Institute of Technology',tagline:'Learn. Lead. Make an impact.',location:'Tamil Nadu, India',established:2004,about:'A student-focused institution encouraging academic excellence, practical learning, innovation and community.',email:'info@northbridge.example',phone:'+91 98765 00000',departments:['Information Technology','Computer Science','Electronics','Mechanical','Civil']},
  students:[
@@ -27,22 +36,63 @@ const seed={
  {id:4,department:'Information Technology',year:'III Year',day:'Monday',time:'01:30 PM',subject:'Computer Networks',room:'IT-205',faculty:'Demo Faculty'}],
  attendanceRecords:[],feesRecords:[],tasks:[{id:1,title:'Review low-attendance list',done:false,owner:'Academic office'},{id:2,title:'Publish lab internal marks',done:true,owner:'IT department'}]
 };
-function readData(){try{if(!fs.existsSync(DATA_FILE)){fs.mkdirSync(DATA_DIR,{recursive:true});fs.writeFileSync(DATA_FILE,JSON.stringify(seed,null,2));}const d=JSON.parse(fs.readFileSync(DATA_FILE,'utf8'));d.college=d.college||seed.college;d.staff=d.staff||seed.staff;d.attendanceRecords=d.attendanceRecords||[];d.feesRecords=d.feesRecords||[];d.tasks=d.tasks||seed.tasks;d.notices=d.notices||seed.notices;d.timetable=(d.timetable||seed.timetable).map((t,i)=>({id:t.id||Date.now()+i,department:t.department||'Information Technology',year:t.year||'III Year',day:t.day||'Monday',...t}));d.students=(d.students||seed.students).map((s,i)=>({...seed.students.find(x=>x.id===s.id),...s,rollNo:s.rollNo||s.id,feesTotal:Number(s.feesTotal||60000),feesPaid:Number(s.feesPaid||0)}));writeData(d);return d;}catch(e){console.error('Data read error',e.message);return structuredClone(seed)}}
+function hashPassword(password,salt=crypto.randomBytes(16).toString('hex')){
+ const hash=crypto.scryptSync(String(password),salt,64).toString('hex');
+ return salt+':'+hash;
+}
+function verifyPassword(password,stored){
+ if(typeof stored!=='string'||!stored.includes(':')) return false;
+ const [salt,expected]=stored.split(':');
+ if(!salt||!expected) return false;
+ const actual=crypto.scryptSync(String(password),salt,64);
+ const target=Buffer.from(expected,'hex');
+ return target.length===actual.length&&crypto.timingSafeEqual(actual,target);
+}
+function readData(){try{if(!fs.existsSync(DATA_FILE)){fs.mkdirSync(DATA_DIR,{recursive:true});fs.writeFileSync(DATA_FILE,JSON.stringify(seed,null,2));}const d=JSON.parse(fs.readFileSync(DATA_FILE,'utf8'));d.college=d.college||seed.college;d.staff=d.staff||seed.staff;d.attendanceRecords=d.attendanceRecords||[];d.feesRecords=d.feesRecords||[];d.tasks=d.tasks||seed.tasks;d.notices=d.notices||seed.notices;d.timetable=(d.timetable||seed.timetable).map((t,i)=>({id:t.id||Date.now()+i,department:t.department||'Information Technology',year:t.year||'III Year',day:t.day||'Monday',...t}));d.students=(d.students||seed.students).map((s,i)=>({...seed.students.find(x=>x.id===s.id),...s,rollNo:s.rollNo||s.id,feesTotal:Number(s.feesTotal||60000),feesPaid:Number(s.feesPaid||0)}));
+ let migrated=false;
+ d.staff=(d.staff||seed.staff).map(st=>{
+   if(!st.passwordHash&&st.password){const next={...st,passwordHash:hashPassword(st.password)};delete next.password;migrated=true;return next;}
+   if(st.password){const next={...st};delete next.password;migrated=true;return next;}
+   return st;
+ });
+ if(migrated) console.log('Migrated staff credentials to password hashes.');
+ writeData(d);return d;}catch(e){console.error('Data read error',e.message);return structuredClone(seed)}}
 function writeData(d){fs.mkdirSync(DATA_DIR,{recursive:true});fs.writeFileSync(DATA_FILE,JSON.stringify(d,null,2));}
 const sessions=new Map();
+const loginAttempts=new Map();
+const SESSION_TTL=8*60*60*1000;
 function token(){return crypto.randomBytes(32).toString('hex')}
-function auth(req,res,next){const t=(req.headers.authorization||'').replace(/^Bearer\s+/i,'');const u=sessions.get(t);if(!u)return res.status(401).json({error:'Please log in again.'});req.user=u;next()}
+function auth(req,res,next){
+ const t=(req.headers.authorization||'').replace(/^Bearer\\s+/i,'');
+ const session=sessions.get(t);
+ if(!session||session.expiresAt<Date.now()){if(session)sessions.delete(t);return res.status(401).json({error:'Please log in again.'});}
+ req.user=session.user;req.sessionToken=t;next();
+}
+function limitLogin(req,res,next){
+ const key=req.ip||req.socket.remoteAddress||'unknown',now=Date.now(),windowMs=15*60*1000,max=10;
+ let entry=loginAttempts.get(key);
+ if(!entry||now-entry.start>windowMs){entry={start:now,count:0};loginAttempts.set(key,entry);}
+ if(entry.count>=max){res.setHeader('Retry-After',String(Math.ceil((windowMs-(now-entry.start))/1000)));return res.status(429).json({error:'Too many login attempts. Please wait 15 minutes and try again.'});}
+ req.recordLoginFailure=()=>{entry.count++;};
+ req.clearLoginFailures=()=>loginAttempts.delete(key);
+ next();
+}
 function role(r){return (req,res,next)=>req.user.role===r?next():res.status(403).json({error:'This account does not have permission.'})}
 function safeStudent(s){const {feesTotal,feesPaid,...rest}=s;return rest}
 app.get('/api/health',(_q,r)=>r.json({ok:true,app:'Smart Campus',mode:'demo-file-storage',time:new Date().toISOString()}));
 app.get('/api/public/overview',(_q,r)=>{const d=readData();r.json({college:d.college,students:d.students.length,faculty:d.staff.length,departments:d.college.departments.length,notices:d.notices,events:d.notices.filter(n=>n.category==='Events')})});
-app.post('/api/login',(req,res)=>{const {role:kind,username,password}=req.body||{};const d=readData();let user=null;
- if(kind==='staff'){user=d.staff.find(s=>s.email.toLowerCase()===String(username||'').toLowerCase()&&s.password===password)}
- if(kind==='student'){user=d.students.find(s=>(s.id.toLowerCase()===String(username||'').toLowerCase()||s.email.toLowerCase()===String(username||'').toLowerCase())&&String(password)===s.id)}
- if(!user)return res.status(401).json({error:'Login details are incorrect. Demo credentials are shown on the login screen.'});
- const t=token();const u=kind==='staff'?{id:user.id,name:user.name,email:user.email,role:'staff',department:user.department}:{id:user.id,name:user.name,email:user.email,role:'student',department:user.department,year:user.year};sessions.set(t,u);res.json({token:t,user:u});
+app.post('/api/login',limitLogin,(req,res)=>{const {role:kind,username,password}=req.body||{};const d=readData();let user=null;
+ if(typeof username!=='string'||typeof password!=='string'||username.length>160||password.length>256||!['staff','student'].includes(kind)){
+   req.recordLoginFailure();return res.status(400).json({error:'Enter a valid account type, username and password.'});
+ }
+ if(kind==='staff'){const candidate=d.staff.find(s=>s.email.toLowerCase()===username.trim().toLowerCase());if(candidate&&verifyPassword(password,candidate.passwordHash))user=candidate;}
+ if(kind==='student'){user=d.students.find(s=>(s.id.toLowerCase()===username.trim().toLowerCase()||s.email.toLowerCase()===username.trim().toLowerCase())&&password===s.id)}
+ if(!user){req.recordLoginFailure();return res.status(401).json({error:'Login details are incorrect. Check the demo credentials and try again.'});}
+ req.clearLoginFailures();
+ const t=token();const u=kind==='staff'?{id:user.id,name:user.name,email:user.email,role:'staff',department:user.department}:{id:user.id,name:user.name,email:user.email,role:'student',department:user.department,year:user.year};sessions.set(t,{user:u,expiresAt:Date.now()+SESSION_TTL});res.json({token:t,user:u,expiresIn:SESSION_TTL});
 });
 app.get('/api/me',auth,(req,res)=>res.json(req.user));
+app.post('/api/logout',auth,(req,res)=>{sessions.delete(req.sessionToken);res.json({ok:true});});
 app.get('/api/student/me',auth,role('student'),(req,res)=>{const d=readData(),s=d.students.find(x=>x.id===req.user.id);if(!s)return res.status(404).json({error:'Student record not found'});res.json({student:safeStudent(s),fees:{total:s.feesTotal,paid:s.feesPaid,due:Math.max(0,s.feesTotal-s.feesPaid)},attendanceRecords:d.attendanceRecords.filter(a=>a.studentId===s.id),timetable:d.timetable.filter(t=>t.department===s.department&&t.year===s.year),notices:d.notices})});
 app.get('/api/staff/dashboard',auth,role('staff'),(_q,res)=>{const d=readData();res.json({students:d.students.map(s=>({...safeStudent(s),feesDue:Math.max(0,s.feesTotal-s.feesPaid)})),staff:d.staff.map(({password,...s})=>s),timetable:d.timetable,attendanceRecords:d.attendanceRecords,feesRecords:d.feesRecords,notices:d.notices,college:d.college})});
 app.post('/api/staff/attendance',auth,role('staff'),(req,res)=>{const {studentId,date,status,subject}=req.body||{};if(!studentId||!date||!['Present','Absent','Late'].includes(status))return res.status(400).json({error:'Student, date and status are required.'});const d=readData(),s=d.students.find(x=>x.id===studentId);if(!s)return res.status(404).json({error:'Student not found'});const rec={id:Date.now(),studentId,date,status,subject:String(subject||'General')};d.attendanceRecords.unshift(rec);const records=d.attendanceRecords.filter(a=>a.studentId===studentId);s.attendance=Math.round(records.filter(a=>a.status==='Present'||a.status==='Late').length/records.length*100);writeData(d);res.status(201).json(rec)});

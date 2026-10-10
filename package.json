@@ -1,7 +1,7 @@
 {
-  "name": "northstar-college-admissions",
-  "version": "1.0.0",
-  "description": "College admission portal demo with frontend and backend",
+  "name": "tamil-academy-admissions",
+  "version": "1.1.0",
+  "description": "Tamil Academy admissions portal demonstration",
   "main": "server.js",
   "scripts": { "start": "node server.js" },
   "dependencies": { "express": "^4.21.2" }

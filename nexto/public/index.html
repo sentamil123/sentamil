@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#090b12">
+<meta name="description" content="Nexto — share moments, meet your people, and discover what's next.">
+<title>Nexto — your world, your people</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar">
+    <a class="brand" href="#" aria-label="Nexto home"><span class="brand-mark">n</span><span>nexto<span class="brand-dot">.</span></span></a>
+    <div class="side-label">MENU</div>
+    <nav class="nav-links">
+      <button class="nav-item active" data-view="home"><span class="nav-icon">⌂</span> Home</button>
+      <button class="nav-item" data-view="explore"><span class="nav-icon">⌕</span> Explore</button>
+      <button class="nav-item" data-view="reels"><span class="nav-icon">▷</span> Reels <span class="new-tag">NEW</span></button>
+      <button class="nav-item" data-view="messages"><span class="nav-icon">↗</span> Messages <span class="nav-count">2</span></button>
+      <button class="nav-item" data-view="notifications"><span class="nav-icon">♡</span> Notifications</button>
+      <button class="nav-item" data-view="saved"><span class="nav-icon">⌑</span> Saved</button>
+    </nav>
+    <div class="side-label spaces-label">YOUR SPACE</div>
+    <button class="nav-item" data-view="profile"><span class="nav-icon">◉</span> My profile</button>
+    <button class="nav-item" data-view="create"><span class="nav-icon">＋</span> Create post</button>
+    <div class="sidebar-bottom">
+      <div class="upgrade-card"><div class="upgrade-icon">✦</div><strong>Your next chapter.</strong><p>Good things happen when you share them.</p><button id="sidebarCreate">Create a post <span>↗</span></button></div>
+      <button class="account-mini" id="profileShortcut"><span class="avatar avatar-me">S</span><span class="account-text"><strong>sentamil</strong><small>Personal account</small></span><span class="more">•••</span></button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <header class="topbar">
+      <div class="mobile-brand"><span class="brand-mark">n</span> nexto<span class="brand-dot">.</span></div>
+      <label class="searchbox"><span>⌕</span><input id="searchInput" placeholder="Search people, posts, places..." autocomplete="off"><kbd>⌘ K</kbd></label>
+      <div class="top-actions"><button class="icon-button" data-view="notifications" aria-label="Notifications">♧<i class="alert-dot"></i></button><button class="top-create" id="topCreate"><span>＋</span> Create</button></div>
+    </header>
+
+    <div class="content-grid">
+      <section class="feed-column">
+        <div class="welcome-row"><div><div class="eyebrow"><span class="live-dot"></span> YOUR DAILY DOSE OF NEXTO</div><h1 id="pageTitle">Your world, <span>your people.</span></h1><p id="pageSubtitle">A little inspiration from people you follow.</p></div><div class="date-pill" id="todayLabel">TODAY · 2026</div></div>
+
+        <section class="stories-section">
+          <div class="section-heading"><h2>Stories <span class="muted-count">· 8</span></h2><button class="text-button" id="allStories">View all <span>↗</span></button></div>
+          <div class="stories-track" id="storiesTrack"></div>
+        </section>
+
+        <div class="feed-heading"><div><h2 id="feedHeading">Your feed</h2><span class="feed-caption">THE LATEST FROM YOUR CIRCLE</span></div><div class="feed-filter"><button class="filter-btn selected" data-filter="for-you">For you</button><button class="filter-btn" data-filter="following">Following</button></div></div>
+        <div id="feedList" class="feed-list"></div>
+        <div class="end-note"><span>✦</span><strong>You're all caught up.</strong><p>Go make something worth sharing.</p></div>
+      </section>
+
+      <aside class="right-column">
+        <div class="profile-card">
+          <div class="profile-card-top"><span class="card-eyebrow">YOUR SPACE</span><button class="dots-btn" aria-label="More">•••</button></div>
+          <div class="profile-identity"><div class="profile-avatar">S<span class="online-indicator"></span></div><div><strong>Sentamil V</strong><span>@sentamil</span></div><button class="edit-profile" id="editProfile">↗</button></div>
+          <p class="profile-bio">Building things, collecting moments ✦<br>IT student · India 🇮🇳</p>
+          <div class="profile-stats"><div><strong id="myPostCount">3</strong><span>Posts</span></div><div><strong>248</strong><span>Followers</span></div><div><strong>196</strong><span>Following</span></div></div>
+          <button class="profile-view-btn" data-view="profile">View profile <span>→</span></button>
+        </div>
+        <div class="suggestions-card"><div class="section-heading"><h2>People to know</h2><button class="text-button" id="refreshSuggestions">Refresh ↻</button></div><div id="suggestionsList"></div><button class="see-all" data-view="explore">Discover your people <span>↗</span></button></div>
+        <div class="trend-card"><div class="trend-title"><span class="trend-spark">✦</span><span>HAPPENING ON NEXTO</span></div><div class="trend-item"><span class="trend-num">01</span><div><strong>#BuildInPublic</strong><small>2.4k posts · Trending</small></div><span class="trend-arrow">↗</span></div><div class="trend-item"><span class="trend-num">02</span><div><strong>#CampusDiaries</strong><small>1.8k posts · Trending</small></div><span class="trend-arrow">↗</span></div><div class="trend-item"><span class="trend-num">03</span><div><strong>#LittleWins</strong><small>946 posts · Trending</small></div><span class="trend-arrow">↗</span></div></div>
+        <footer class="footer-links"><div><a href="#">About</a><a href="#">Guidelines</a><a href="#">Privacy</a><a href="#">Help</a></div><span>© 2026 NEXTO SOCIAL</span><span class="demo-disclaimer">DEMO EXPERIENCE · SAMPLE CONTENT</span></footer>
+      </aside>
+    </div>
+  </main>
+</div>
+
+<nav class="mobile-nav"><button class="active" data-view="home">⌂<small>Home</small></button><button data-view="explore">⌕<small>Explore</small></button><button id="mobileCreate" class="mobile-plus">＋</button><button data-view="notifications">♡<small>Activity</small></button><button data-view="profile">◉<small>Profile</small></button></nav>
+
+<div class="modal-backdrop" id="postModal" aria-hidden="true"><section class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="modal-head"><div><span class="eyebrow">MAKE IT A MOMENT</span><h2 id="modalTitle">Create something.</h2></div><button class="close-modal" data-close="postModal" aria-label="Close">×</button></div><form id="postForm"><label class="form-label" for="postCaption">What's on your mind?</label><textarea id="postCaption" maxlength="500" placeholder="Share a thought, a win, a little moment..." required></textarea><div class="form-row"><label class="upload-box" for="postImage"><span>▧</span><strong>Add a photo</strong><small>Choose an image from your device</small><input id="postImage" type="file" accept="image/*"></label><div class="form-side-note"><span>✦</span><strong>Your story matters.</strong><p>Share something real with your circle.</p></div></div><div class="image-preview" id="imagePreview"></div><div class="modal-footer"><span id="charCount">0 / 500</span><button class="primary-button" type="submit">Share post <span>↗</span></button></div></form></section></div>
+
+<div class="modal-backdrop" id="profileModal" aria-hidden="true"><section class="modal small-modal" role="dialog" aria-modal="true" aria-labelledby="profileModalTitle"><div class="modal-head"><div><span class="eyebrow">YOUR IDENTITY</span><h2 id="profileModalTitle">Edit your profile.</h2></div><button class="close-modal" data-close="profileModal" aria-label="Close">×</button></div><form id="profileForm"><label class="form-label">Display name<input id="displayName" maxlength="40" value="Sentamil V" required></label><label class="form-label">Username<input id="userName" maxlength="24" value="sentamil" required></label><label class="form-label">Bio<textarea id="userBio" maxlength="160">Building things, collecting moments ✦ IT student · India 🇮🇳</textarea></label><div class="modal-footer"><span>Make it yours</span><button class="primary-button" type="submit">Save changes ↗</button></div></form></section></div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="/app.js"></script>
+</body>
+</html>

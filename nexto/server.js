@@ -21,15 +21,15 @@ const validUser=s=>typeof s==='string'&&/^[a-z0-9._]{3,24}$/.test(s);
 async function init(){
  if(!pool)return;
  const ddl=[
- 'CREATE TABLE IF NOT EXISTS users(id BIGSERIAL PRIMARY KEY,username VARCHAR(24) UNIQUE NOT NULL,email VARCHAR(254) UNIQUE NOT NULL,password_hash TEXT NOT NULL,display_name VARCHAR(60) NOT NULL,bio VARCHAR(160) NOT NULL DEFAULT \\'\\',avatar_url TEXT,created_at TIMESTAMPTZ NOT NULL DEFAULT NOW())',
- 'CREATE TABLE IF NOT EXISTS posts(id BIGSERIAL PRIMARY KEY,user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,caption VARCHAR(500) NOT NULL DEFAULT \\'\\',media_url TEXT,media_type VARCHAR(10) NOT NULL DEFAULT \\'text\\' CHECK(media_type IN (\\'text\\',\\'image\\',\\'video\\')),created_at TIMESTAMPTZ NOT NULL DEFAULT NOW())',
- 'CREATE TABLE IF NOT EXISTS follows(follower_id BIGINT REFERENCES users(id) ON DELETE CASCADE,following_id BIGINT REFERENCES users(id) ON DELETE CASCADE,created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),PRIMARY KEY(follower_id,following_id),CHECK(follower_id<>following_id))',
- 'CREATE TABLE IF NOT EXISTS post_likes(user_id BIGINT REFERENCES users(id) ON DELETE CASCADE,post_id BIGINT REFERENCES posts(id) ON DELETE CASCADE,created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),PRIMARY KEY(user_id,post_id))',
- 'CREATE TABLE IF NOT EXISTS comments(id BIGSERIAL PRIMARY KEY,post_id BIGINT REFERENCES posts(id) ON DELETE CASCADE,user_id BIGINT REFERENCES users(id) ON DELETE CASCADE,body VARCHAR(240) NOT NULL,created_at TIMESTAMPTZ NOT NULL DEFAULT NOW())',
- 'CREATE TABLE IF NOT EXISTS saved_posts(user_id BIGINT REFERENCES users(id) ON DELETE CASCADE,post_id BIGINT REFERENCES posts(id) ON DELETE CASCADE,created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),PRIMARY KEY(user_id,post_id))',
- 'CREATE INDEX IF NOT EXISTS posts_created_idx ON posts(created_at DESC)',
- 'CREATE INDEX IF NOT EXISTS posts_user_idx ON posts(user_id,created_at DESC)',
- 'CREATE INDEX IF NOT EXISTS comments_post_idx ON comments(post_id,created_at)'
+ "CREATE TABLE IF NOT EXISTS users(id BIGSERIAL PRIMARY KEY,username VARCHAR(24) UNIQUE NOT NULL,email VARCHAR(254) UNIQUE NOT NULL,password_hash TEXT NOT NULL,display_name VARCHAR(60) NOT NULL,bio VARCHAR(160) NOT NULL DEFAULT '',avatar_url TEXT,created_at TIMESTAMPTZ NOT NULL DEFAULT NOW())",
+ "CREATE TABLE IF NOT EXISTS posts(id BIGSERIAL PRIMARY KEY,user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,caption VARCHAR(500) NOT NULL DEFAULT '',media_url TEXT,media_type VARCHAR(10) NOT NULL DEFAULT 'text' CHECK(media_type IN ('text','image','video')),created_at TIMESTAMPTZ NOT NULL DEFAULT NOW())",
+ "CREATE TABLE IF NOT EXISTS follows(follower_id BIGINT REFERENCES users(id) ON DELETE CASCADE,following_id BIGINT REFERENCES users(id) ON DELETE CASCADE,created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),PRIMARY KEY(follower_id,following_id),CHECK(follower_id<>following_id))",
+ "CREATE TABLE IF NOT EXISTS post_likes(user_id BIGINT REFERENCES users(id) ON DELETE CASCADE,post_id BIGINT REFERENCES posts(id) ON DELETE CASCADE,created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),PRIMARY KEY(user_id,post_id))",
+ "CREATE TABLE IF NOT EXISTS comments(id BIGSERIAL PRIMARY KEY,post_id BIGINT REFERENCES posts(id) ON DELETE CASCADE,user_id BIGINT REFERENCES users(id) ON DELETE CASCADE,body VARCHAR(240) NOT NULL,created_at TIMESTAMPTZ NOT NULL DEFAULT NOW())",
+ "CREATE TABLE IF NOT EXISTS saved_posts(user_id BIGINT REFERENCES users(id) ON DELETE CASCADE,post_id BIGINT REFERENCES posts(id) ON DELETE CASCADE,created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),PRIMARY KEY(user_id,post_id))",
+ "CREATE INDEX IF NOT EXISTS posts_created_idx ON posts(created_at DESC)",
+ "CREATE INDEX IF NOT EXISTS posts_user_idx ON posts(user_id,created_at DESC)",
+ "CREATE INDEX IF NOT EXISTS comments_post_idx ON comments(post_id,created_at)"
  ];
  for(const q of ddl) await pool.query(q);
 }

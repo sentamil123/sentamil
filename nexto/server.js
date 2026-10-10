@@ -10,6 +10,8 @@ const PORT = process.env.PORT || 3000;
 const pool = process.env.DATABASE_URL ? new Pool({connectionString:process.env.DATABASE_URL,ssl:process.env.NODE_ENV==='production'?{rejectUnauthorized:false}:undefined,options:'-c search_path=nexto,public',max:5}) : null;
 const secret = process.env.JWT_SECRET;
 app.disable('x-powered-by');
+// Render runs behind a trusted reverse proxy; required for secure client IP rate limiting.
+app.set('trust proxy', 1);
 app.use(helmet({contentSecurityPolicy:false}));
 app.use(express.json({limit:'6mb'}));
 app.use(express.static(path.join(__dirname,'public')));

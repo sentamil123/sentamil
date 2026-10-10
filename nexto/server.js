@@ -67,6 +67,14 @@ app.patch('/api/users/me',db,auth,run(async(req,res)=>{
  if(avatar!==null&&avatar!==undefined&&(typeof avatar!=='string'||avatar.length>1500000||!['data:image/png;base64,','data:image/jpeg;base64,','data:image/webp;base64,','data:image/gif;base64,'].some(prefix=>avatar.startsWith(prefix))))return res.status(400).json({error:'Use a small PNG, JPG, WEBP or GIF profile photo.'});
  try{const r=await pool.query('UPDATE users SET username=$1,display_name=$2,bio=$3,avatar_url=$4 WHERE id=$5 RETURNING *',[username,name,bio,avatar,req.user.id]);res.json({user:userOut(r.rows[0])})}catch(e){if(e.code==='23505')return res.status(409).json({error:'That username is already taken.'});throw e}
 }));
+app.delete('/api/users/me',db,auth,run(async(req,res)=>{
+ const password=req.body.password;
+ if(typeof password!=='string'||!password)return res.status(400).json({error:'Enter your password to delete your account.'});
+ const current=await pool.query('SELECT password_hash FROM users WHERE id=$1',[req.user.id]);
+ if(!current.rowCount||!(await bcrypt.compare(password,current.rows[0].password_hash)))return res.status(401).json({error:'Password is incorrect. Your account was not deleted.'});
+ await pool.query('DELETE FROM users WHERE id=$1',[req.user.id]);
+ res.json({ok:true,message:'Account and associated posts, comments, likes, saves and follows were deleted.'});
+}));
 const postSQL='SELECT p.id,p.user_id,p.caption,p.media_url,p.media_type,p.created_at,u.username,u.display_name,u.avatar_url,(SELECT COUNT(*)::int FROM post_likes l WHERE l.post_id=p.id) likes_count,(SELECT COUNT(*)::int FROM comments c WHERE c.post_id=p.id) comments_count,EXISTS(SELECT 1 FROM post_likes l WHERE l.post_id=p.id AND l.user_id=$1) liked,EXISTS(SELECT 1 FROM saved_posts s WHERE s.post_id=p.id AND s.user_id=$1) saved,(SELECT COUNT(*)::int FROM follows f WHERE f.following_id=p.user_id) followers_count FROM posts p JOIN users u ON u.id=p.user_id';
 const postOut=p=>({id:String(p.id),userId:String(p.user_id),user:p.username,name:p.display_name,avatarUrl:p.avatar_url,caption:p.caption,image:p.media_type==='image'?p.media_url:null,video:p.media_type==='video'?p.media_url:null,mediaType:p.media_type,time:p.created_at,likes:p.likes_count,commentsCount:p.comments_count,liked:p.liked,saved:p.saved,followers:p.followers_count});
 app.get('/api/posts',db,run(async(req,res)=>{

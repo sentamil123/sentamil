@@ -27,7 +27,7 @@ const seed={
  {id:4,department:'Information Technology',year:'III Year',day:'Monday',time:'01:30 PM',subject:'Computer Networks',room:'IT-205',faculty:'Demo Faculty'}],
  attendanceRecords:[],feesRecords:[],tasks:[{id:1,title:'Review low-attendance list',done:false,owner:'Academic office'},{id:2,title:'Publish lab internal marks',done:true,owner:'IT department'}]
 };
-function readData(){try{if(!fs.existsSync(DATA_FILE)){fs.mkdirSync(DATA_DIR,{recursive:true});fs.writeFileSync(DATA_FILE,JSON.stringify(seed,null,2));}return JSON.parse(fs.readFileSync(DATA_FILE,'utf8'));}catch(e){console.error('Data read error',e.message);return structuredClone(seed)}}
+function readData(){try{if(!fs.existsSync(DATA_FILE)){fs.mkdirSync(DATA_DIR,{recursive:true});fs.writeFileSync(DATA_FILE,JSON.stringify(seed,null,2));}const d=JSON.parse(fs.readFileSync(DATA_FILE,'utf8'));d.college=d.college||seed.college;d.staff=d.staff||seed.staff;d.attendanceRecords=d.attendanceRecords||[];d.feesRecords=d.feesRecords||[];d.tasks=d.tasks||seed.tasks;d.notices=d.notices||seed.notices;d.timetable=(d.timetable||seed.timetable).map((t,i)=>({id:t.id||Date.now()+i,department:t.department||'Information Technology',year:t.year||'III Year',day:t.day||'Monday',...t}));d.students=(d.students||seed.students).map((s,i)=>({...seed.students.find(x=>x.id===s.id),...s,rollNo:s.rollNo||s.id,feesTotal:Number(s.feesTotal||60000),feesPaid:Number(s.feesPaid||0)}));writeData(d);return d;}catch(e){console.error('Data read error',e.message);return structuredClone(seed)}}
 function writeData(d){fs.mkdirSync(DATA_DIR,{recursive:true});fs.writeFileSync(DATA_FILE,JSON.stringify(d,null,2));}
 const sessions=new Map();
 function token(){return crypto.randomBytes(32).toString('hex')}

@@ -1,23 +1,22 @@
-# Northstar College Admission Portal
+# Tamil Academy — Admissions Portal
 
-A responsive college admissions portal demo with an admission modal, Express API, and an admin application review page.
+A responsive admissions website demonstration with programme discovery, a three-step application form, an Express API, and an application-review dashboard.
 
 ## Features
-- University landing page with programme cards
-- Multi-step admission form and client-side validation
-- Node.js + Express API for application submissions
-- JSON-file persistence for local demo applications
-- Admin dashboard to view applications and update status
+- Tamil Academy branding and responsive landing page
+- Programme cards, campus-life section, admissions steps and FAQ
+- Multi-step application form with review, validation and reference ID
+- Node.js + Express API
+- Admin review page with application status updates
+- Health endpoint at `/api/health`
 
 ## Run locally
 1. Install Node.js.
-2. Clone or download this repository.
+2. Clone this repository.
 3. Run `npm install`.
-4. Run `npm start`.
-5. Open `http://localhost:3000`.
-6. Admin page: `http://localhost:3000/admin.html`.
-
-Demo admin key: `demo-admin-key-change-me`.
+4. Set a strong `ADMIN_KEY` environment variable.
+5. Run `npm start`.
+6. Open `http://localhost:3000`; admin page is `http://localhost:3000/admin.html`.
 
 ## Important
-This is a demonstration project, not a real college admissions service. Before deployment, configure a strong `ADMIN_KEY`, use HTTPS, and use a production database and proper authentication. Do not store real student information in the demo JSON file.
+This is a website demonstration, not an official institution or live admissions service. Programme information is illustrative. The current JSON-file storage is suitable only for a local demo and may not persist on hosted platforms. Do not submit real student data until production-grade database persistence, secure administrator authentication, privacy controls, and verified institutional details are implemented.

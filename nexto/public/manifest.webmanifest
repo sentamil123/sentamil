@@ -1,0 +1,24 @@
+{
+  "id": "/",
+  "name": "Nexto Social",
+  "short_name": "Nexto",
+  "description": "Share moments, meet your people, and discover what's next.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "categories": [
+    "social",
+    "lifestyle"
+  ],
+  "icons": [
+    {
+      "src": "/icons/nexto.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

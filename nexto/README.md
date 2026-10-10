@@ -1,39 +1,45 @@
 # Nexto
 
-Nexto is an Instagram-inspired social media app prototype, built with Node.js, Express, HTML, CSS and vanilla JavaScript.
+Nexto is an Instagram-inspired social application built with Node.js, Express, PostgreSQL, HTML, CSS and vanilla JavaScript.
 
 ## Run locally
 
 1. Install Node.js 18 or newer.
-2. In this folder run:
+2. Create a PostgreSQL database.
+3. In this folder, set environment variables:
+   - `DATABASE_URL`: PostgreSQL connection string
+   - `JWT_SECRET`: random secret with at least 32 characters
+   - `NODE_ENV=production` when deployed
+4. Run:
    ```bash
    npm install
    npm start
    ```
-3. Open `http://localhost:3000`.
+5. Open `http://localhost:3000`.
 
-## Current prototype features
+The server creates the required tables on startup.
 
-- Responsive desktop and mobile layouts
-- Home feed with sample posts and story bubbles
-- Create text posts and attach a small image
-- Like, comment, save and delete your own posts
-- Follow/unfollow suggested creators
-- Search sample people and posts
-- Edit local profile
-- Explore, saved and profile views
-- Health endpoint at `/api/health`
+## Implemented backend
 
-## Important status
+- Account registration and login with bcrypt password hashing
+- Signed seven-day JWT sessions
+- Profile editing (display name, username, bio and small profile image)
+- Persistent posts (text, image and short video/Reel)
+- Like/unlike, comment, save/unsave and delete-own-post endpoints
+- Follow/unfollow with real database follower/following relationships
+- User search and followers/following lists
+- Request rate limits, security headers, input validation and parameterized SQL
+- Health check at `/api/health`
 
-This first version is a **front-end prototype**. Posts, likes, follows, comments and profile edits are saved in the browser's local storage on the current device. Sample accounts are mock content; there is no real account system, secure login, cross-device sync, live messaging, or actual video upload yet. Do not enter passwords or sensitive personal data. The Express health endpoint is available for deployment checks.
+## Media storage note
 
-## Next development phases
+For this MVP, small media files are stored as data URLs in PostgreSQL. The browser upload controls limit file size to keep this manageable. A larger public release should use dedicated object storage (for example, an S3-compatible service or Cloudinary) and store only media URLs in PostgreSQL.
 
-1. Add a real database and user registration/login.
-2. Add image/video storage with a storage provider.
-3. Add follow graph, notifications and direct messaging.
-4. Add moderation/reporting tools and an admin dashboard.
-5. Add tests, deployment environment variables and production security hardening.
+## Current limitations
 
-Free hosting and storage tiers have limits and may change. Before a public launch, implement secure authentication, authorization, rate limits, input validation, privacy controls, moderation and persistent storage.
+- Direct messaging, story creation/viewer with 24-hour expiry, notifications, password reset/email verification, account reporting/blocking and admin moderation still need implementation.
+- There is no automated test suite or production security audit yet.
+- Render's free web services may sleep, and free database plans have their own limits/expiry policies. Confirm current plan terms before relying on them for permanent data.
+- Do not publish production secrets in GitHub. Configure `DATABASE_URL` and `JWT_SECRET` in the hosting dashboard.
+
+This is a growing MVP, not yet equivalent to Instagram's scale or production readiness.

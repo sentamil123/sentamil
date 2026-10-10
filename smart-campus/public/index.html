@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#123b32">
+  <meta name="description" content="Smart Campus — a unified college operations dashboard demo.">
+  <title>Smart Campus | College Operations</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar">
+    <a class="brand" href="#" aria-label="Smart Campus home"><span class="brand-mark">SC</span><span><b>smart campus</b><small>COLLEGE OS · DEMO</small></span></a>
+    <div class="campus-select"><span class="campus-dot"></span><span><b>Northbridge Institute</b><small>Academic year 2026–27</small></span><span class="chevron">⌄</span></div>
+    <p class="nav-label">WORKSPACE</p>
+    <nav class="nav-list">
+      <button class="nav-item active" data-page="overview"><span class="nav-icon">◫</span> Overview</button>
+      <button class="nav-item" data-page="students"><span class="nav-icon">♙</span> Students <span class="nav-count" id="studentNavCount">6</span></button>
+      <button class="nav-item" data-page="attendance"><span class="nav-icon">◷</span> Attendance</button>
+      <button class="nav-item" data-page="academics"><span class="nav-icon">▤</span> Academics</button>
+      <button class="nav-item" data-page="notices"><span class="nav-icon">▧</span> Notices & events</button>
+      <button class="nav-item" data-page="tasks"><span class="nav-icon">☑</span> Operations</button>
+    </nav>
+    <p class="nav-label">MANAGEMENT</p>
+    <nav class="nav-list">
+      <button class="nav-item" data-page="departments"><span class="nav-icon">▦</span> Departments</button>
+      <button class="nav-item" data-page="reports"><span class="nav-icon">⌁</span> Reports & insights</button>
+    </nav>
+    <div class="sidebar-bottom"><div class="support-card"><div class="support-icon">✦</div><b>Campus, connected.</b><p>One workspace for every academic day.</p><span class="pill">PREVIEW ENVIRONMENT</span></div><div class="profile"><div class="avatar">AD</div><div><b>Campus Admin</b><small>Demo workspace</small></div><span class="more">···</span></div></div>
+  </aside>
+  <main class="main">
+    <header class="topbar"><button class="mobile-menu" id="mobileMenu" aria-label="Toggle menu">☰</button><div class="breadcrumbs">Workspace <span>/</span> <b id="crumb">Overview</b></div><div class="top-actions"><div class="search-global"><span>⌕</span><input id="globalSearch" placeholder="Search students, notices…" aria-label="Search campus"><kbd>⌘ K</kbd></div><button class="icon-btn" id="noticeShortcut" aria-label="View notices">♧<i></i></button><div class="top-avatar">AD</div></div></header>
+    <section class="content">
+      <div class="welcome-row"><div><div class="eyebrow"><span class="live-dot"></span> MONDAY, OCTOBER 12, 2026</div><h1 id="pageTitle">Good morning, Admin <span>✳</span></h1><p class="subhead" id="pageSubtitle">Here’s what’s happening across your campus today.</p></div><div class="welcome-actions"><button class="btn btn-light" id="exportBtn">↓ <span>Export report</span></button><button class="btn btn-primary" id="addStudentBtn">＋ Add student</button></div></div>
+      <div class="demo-banner"><span class="demo-banner-icon">ⓘ</span><span><b>Preview environment</b> — using fictional sample records. Connect a persistent database and secure user authentication before entering real student information.</span><button id="dismissBanner" aria-label="Dismiss notice">×</button></div>
+      <div id="pageContent"><div class="loading">Preparing campus dashboard…</div></div>
+      <footer><span>© 2026 Smart Campus · Academic operations, simplified.</span><span><i class="live-dot"></i> Demo API <b id="apiStatus">checking</b></span></footer>
+    </section>
+  </main>
+</div>
+<div class="modal-backdrop" id="modalBackdrop" hidden><section class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="modal-head"><div><span class="eyebrow">CAMPUS DIRECTORY</span><h2 id="modalTitle">Add a student</h2></div><button class="icon-btn" id="closeModal" aria-label="Close">×</button></div><form id="studentForm"><label>Full name<input name="name" required maxlength="80" placeholder="e.g. Kavya Raman"></label><div class="form-grid"><label>Department<select name="department" required><option value="">Choose department</option><option>Information Technology</option><option>Computer Science</option><option>Electronics</option><option>Mechanical</option><option>Civil</option></select></label><label>Academic year<select name="year" required><option value="">Choose year</option><option>I Year</option><option>II Year</option><option>III Year</option><option>IV Year</option></select></label></div><label>College email<input name="email" type="email" required maxlength="120" placeholder="student@campus.test"></label><div class="modal-actions"><button type="button" class="btn btn-light" id="cancelModal">Cancel</button><button type="submit" class="btn btn-primary">Create student</button></div><p class="form-note">Demo data only. Do not enter real or sensitive personal information.</p></form></section></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="/app.js" defer></script>
+</body></html>

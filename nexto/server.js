@@ -7,7 +7,7 @@ const jwt = require('jsonwebtoken');
 const { Pool } = require('pg');
 const app = express();
 const PORT = process.env.PORT || 3000;
-const pool = process.env.DATABASE_URL ? new Pool({connectionString:process.env.DATABASE_URL,ssl:process.env.NODE_ENV==='production'?{rejectUnauthorized:false}:undefined,max:5}) : null;
+const pool = process.env.DATABASE_URL ? new Pool({connectionString:process.env.DATABASE_URL,ssl:process.env.NODE_ENV==='production'?{rejectUnauthorized:false}:undefined,options:'-c search_path=nexto,public',max:5}) : null;
 const secret = process.env.JWT_SECRET;
 app.disable('x-powered-by');
 app.use(helmet({contentSecurityPolicy:false}));
@@ -20,6 +20,7 @@ const userOut=u=>({id:String(u.id),username:u.username,displayName:u.display_nam
 const validUser=s=>typeof s==='string'&&/^[a-z0-9._]{3,24}$/.test(s);
 async function init(){
  if(!pool)return;
+ await pool.query('CREATE SCHEMA IF NOT EXISTS nexto');
  const ddl=[
  "CREATE TABLE IF NOT EXISTS users(id BIGSERIAL PRIMARY KEY,username VARCHAR(24) UNIQUE NOT NULL,email VARCHAR(254) UNIQUE NOT NULL,password_hash TEXT NOT NULL,display_name VARCHAR(60) NOT NULL,bio VARCHAR(160) NOT NULL DEFAULT '',avatar_url TEXT,created_at TIMESTAMPTZ NOT NULL DEFAULT NOW())",
  "CREATE TABLE IF NOT EXISTS posts(id BIGSERIAL PRIMARY KEY,user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,caption VARCHAR(500) NOT NULL DEFAULT '',media_url TEXT,media_type VARCHAR(10) NOT NULL DEFAULT 'text' CHECK(media_type IN ('text','image','video')),created_at TIMESTAMPTZ NOT NULL DEFAULT NOW())",

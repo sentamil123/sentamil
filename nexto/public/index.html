@@ -42,7 +42,7 @@
 
   <main class="main-content">
     <header class="topbar">
-      <div class="mobile-brand"><span class="brand-mark">n</span> nexto<span class="brand-dot">.</span></div>
+      <div class="mobile-brand"><span class="brand-mark">n</span> nexto<span class="brand-dot">.</span><span id="mobileDisplayName" class="mobile-display-name">Sentamil V</span></div>
       <label class="searchbox"><span>⌕</span><input id="searchInput" placeholder="Search people, posts, places..." autocomplete="off"><kbd>⌘ K</kbd></label>
       <div class="top-actions"><button class="icon-button" data-view="notifications" aria-label="Notifications">♧<i class="alert-dot"></i></button><button class="top-create" id="topCreate"><span>＋</span> Create</button></div>
     </header>
@@ -85,6 +85,9 @@
 
 <div class="modal-backdrop" id="listModal" aria-hidden="true"><section class="modal small-modal" role="dialog" aria-modal="true" aria-labelledby="listModalTitle"><div class="modal-head"><div><span class="eyebrow">YOUR COMMUNITY</span><h2 id="listModalTitle">Followers</h2></div><button class="close-modal" data-close="listModal" aria-label="Close">×</button></div><div id="listModalContent" class="list-modal-content"></div></section></div><div class="toast" id="toast" role="status" aria-live="polite"></div>
 <script src="/app.js"></script>
+<script>
+(()=>{const target=document.querySelector('.profile-identity strong');const output=document.getElementById('mobileDisplayName');if(!target||!output)return;const sync=()=>{const name=target.textContent.trim();if(name)output.textContent=name};sync();new MutationObserver(sync).observe(target,{childList:true,characterData:true,subtree:true});})();
+</script>
 <script>if("serviceWorker" in navigator && location.protocol === "https:"){window.addEventListener("load",()=>navigator.serviceWorker.register("/sw.js").catch(()=>{}));}</script>
 </body>
 </html>

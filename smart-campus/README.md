@@ -1,16 +1,32 @@
 # Smart Campus Management System
 
-A responsive college-operations dashboard prototype built with Node.js, Express, HTML, CSS and vanilla JavaScript.
+A responsive college website and campus operations demo built with Node.js, Express, HTML, CSS and vanilla JavaScript.
 
-## Modules
-- Overview dashboard with attendance trend, department indicators and sample KPIs
-- Student directory with search, department filter and add-student form
-- Attendance risk view for records below the 75% threshold
-- Timetable / academics page
-- Notices and events board with demo notice creation
-- Operations task checklist with completion updates
-- Department overview and CSV reports
-- Health endpoint at `/api/health`
+## Public college website
+- Responsive college-style homepage with academics, campus life, announcements and portal entry points
+- Mobile navigation and accessible form labels/status messaging
+- Public overview endpoint for college information and notices
+
+## Student portal
+- Student login using a demo student ID
+- Personal attendance summary and attendance records
+- Department/year timetable, fee total/paid/due, and campus notices
+
+## Staff portal
+- Staff login and role-protected dashboard
+- Mark attendance and review attendance records
+- Add timetable entries
+- Record fee payments
+- Publish campus notices
+- View student/fee records in the demo workspace
+
+## Demo credentials
+- Student ID: `STU2401`
+- Student password: `STU2401`
+- Staff email: `staff@campus.test`
+- Staff password: `Staff@123`
+
+These credentials and the sample institution, people, fees, schedules and notices are fictional. Change them before any public demonstration where you do not want demo accounts exposed.
 
 ## Run locally
 Requirements: Node.js 20+
@@ -24,13 +40,17 @@ npm start
 Open http://localhost:3000.
 
 ## Deployment
-Render can build from the repository root with:
+Render settings:
 - Build command: `npm install --prefix smart-campus`
 - Start command: `npm --prefix smart-campus start`
 - Region: Singapore
 - Plan: Free
 
-## Important limitations
-This is a project demo, not a production-ready student information system. The sample names and KPIs are fictional/illustrative. Without a persistent database, the JSON data store may reset or be lost when the hosting instance restarts or redeploys. Do not enter real student personal data.
+## Security and data limitations
+This remains a **demo/prototype**, not a production-ready student information system:
+- Staff demo passwords are stored as salted scrypt hashes after data migration; login attempts are rate-limited and bearer sessions expire after eight hours.
+- Student demo login still uses the student ID as the password. Replace this with individually provisioned, securely hashed passwords or institutional SSO before real use.
+- The current JSON file store is not a durable production database. Free hosting may restart or reset local files, and in-memory sessions are lost on restart.
+- Do not enter real student records, identity details, payment data or passwords.
 
-Before a real college rollout, implement PostgreSQL migrations and backups, institutional identity/SSO or secure authentication, role-based permissions, audit logs, input validation and rate limiting, secure secrets, privacy/data-retention controls, accessibility testing, automated tests, and a formal security review. Never use this demo as the official record system.
+Before real college deployment, connect a durable PostgreSQL database, implement proper password reset and account provisioning, audit logging, backups, stronger input validation, tests, privacy/retention controls, accessibility checks, and a security review. Validate every workflow with authorised college staff before relying on the system for official records.

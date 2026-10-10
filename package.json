@@ -1,0 +1,8 @@
+{
+  "name": "northstar-college-admissions",
+  "version": "1.0.0",
+  "description": "College admission portal demo with frontend and backend",
+  "main": "server.js",
+  "scripts": { "start": "node server.js" },
+  "dependencies": { "express": "^4.21.2" }
+}

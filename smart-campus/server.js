@@ -64,7 +64,7 @@ const loginAttempts=new Map();
 const SESSION_TTL=8*60*60*1000;
 function token(){return crypto.randomBytes(32).toString('hex')}
 function auth(req,res,next){
- const t=(req.headers.authorization||'').replace(/^Bearer\\s+/i,'');
+ const t=(req.headers.authorization||'').replace(/^Bearer\s+/i,'');
  const session=sessions.get(t);
  if(!session||session.expiresAt<Date.now()){if(session)sessions.delete(t);return res.status(401).json({error:'Please log in again.'});}
  req.user=session.user;req.sessionToken=t;next();
